@@ -42,7 +42,7 @@ Returns a fallback string (not an error) when `retrieved_chunks` is empty.
 *How will you format the retrieved chunks before passing them to the LLM? Describe the structure — not the code. Consider: will you label chunks by game? Include distance scores? Separate chunks with delimiters?*
 
 ```
-[your answer here]
+I will format each retrieved chunk as a clearly labeled context block. Each block will include the chunk number, game name, distance score, and rule text. I will separate chunks with clear delimiters so the model can tell where one source ends and the next begins. Including the game name helps the model cite the correct game, and including the distance score helps preserve retrieval transparency during debugging.
 ```
 
 ---
@@ -52,7 +52,7 @@ Returns a fallback string (not an error) when `retrieved_chunks` is empty.
 *Write the exact system prompt instruction you will use to prevent the model from answering beyond the retrieved text. This is the most important design decision in this function.*
 
 ```
-[your answer here]
+You are RulesBot, a board-game rules assistant. Answer the user's question using only the rule text provided in the context. Do not use outside knowledge, prior knowledge, assumptions, or general board-game knowledge. If the answer is not clearly contained in the provided context, say that the answer could not be found in the loaded rulebook context. Do not invent rules, exceptions, examples, or missing details.
 ```
 
 ---
@@ -62,7 +62,7 @@ Returns a fallback string (not an error) when `retrieved_chunks` is empty.
 *Write the exact instruction you will use to tell the model to identify which game its answer comes from.*
 
 ```
-[your answer here]
+When you answer, identify the game the rule came from. Use a simple citation format such as: "According to the [Game] rules..." If multiple games are relevant, separate the answer by game. Do not cite a game unless its retrieved context supports the answer.
 ```
 
 ---
@@ -72,7 +72,7 @@ Returns a fallback string (not an error) when `retrieved_chunks` is empty.
 *What should the response say when the answer isn't found in the loaded rule books? Write the exact fallback message.*
 
 ```
-[your answer here]
+I could not find that answer in the loaded rulebook context.
 ```
 
 ---
@@ -82,7 +82,7 @@ Returns a fallback string (not an error) when `retrieved_chunks` is empty.
 *`retrieved_chunks` may include chunks with high distance scores (weak relevance). Will you filter these out before building context, pass them all in, or handle them another way? What are the tradeoffs?*
 
 ```
-[your answer here]
+For this milestone, I will pass all retrieved chunks into the context because retrieve() already returns a small number of top results. This makes testing easier because I can see how the model handles both strong and weaker matches. The tradeoff is that weak chunks could distract the model or cause a less focused answer. In a stronger production version, I would filter out chunks with high distance scores or ask the user to clarify when the retrieved context is weak.
 ```
 
 ---
@@ -92,7 +92,7 @@ Returns a fallback string (not an error) when `retrieved_chunks` is empty.
 *Describe how you will structure the messages list for the API call — what goes in the system message vs. the user message?*
 
 ```
-[your answer here]
+The API call will use two messages. The system message will contain the grounding and citation instructions. The user message will contain the formatted retrieved context followed by the user's original question. Keeping the rules in the system message makes the model's behavior stricter, while putting the retrieved chunks and question in the user message gives the model the evidence it needs to answer.
 ```
 
 ---
@@ -104,14 +104,14 @@ Returns a fallback string (not an error) when `retrieved_chunks` is empty.
 **Test query and response:**
 
 ```
-Query: [your test query]
-Response: [abbreviated response]
-Correctly grounded? [yes / no]
-Cited the right game? [yes / no]
+Query: What happens if you roll a 7 in Catan?
+Response: According to the Catan rules, when a 7 is rolled, no resources are produced. Every player with more than 7 resource cards must discard half. The player who rolled moves the robber and steals one resource.
+Correctly grounded? Yes
+Cited the right game? Yes
 ```
 
 **One thing you changed from your original spec after seeing the actual output:**
 
 ```
-[your answer here]
+The response correctly identified Catan and answered from the retrieved context. One improvement I noticed is that the answer cites the game name but does not cite a specific source file or chunk number. For this lab, citing the game is acceptable, but in a stronger version I would include the source filename or chunk ID for better verification.
 ```

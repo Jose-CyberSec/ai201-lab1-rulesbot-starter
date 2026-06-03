@@ -116,11 +116,11 @@ handle these cases better, at the cost of more implementation complexity.
 **Actual chunk count produced across all 8 rule books:**
 
 ```
-[your answer here]
+149 total chunks
 ```
 
 **One thing that surprised you or didn't match your expectations:**
 
 ```
-[your answer here]
+The chunking strategy is simple but effective. I noticed that it splits documents by character count instead of sentence or paragraph boundaries, so some chunks may start or end in the middle of a sentence. The 50-character overlap helps reduce this problem by carrying some context into the next chunk.
 ```
